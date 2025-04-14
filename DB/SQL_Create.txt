@@ -94,3 +94,64 @@ CREATE TABLE profitMargin (
     CostTotal DECIMAL(10,2) DEFAULT 0,  -- Total cost incurred
     FOREIGN KEY (ISBN) REFERENCES book(ISBN) ON DELETE CASCADE
 );
+
+-- ===================================================
+-- INDEXES TO IMPROVE DATABASE PERFORMANCE
+-- ===================================================
+
+-- Indexes for foreign key relationships to improve JOIN operations
+CREATE INDEX idx_book_publisher ON book(PublisherID);
+CREATE INDEX idx_book_category ON book(CategoryID);
+CREATE INDEX idx_book_author_isbn ON book_author(ISBN);
+CREATE INDEX idx_book_author_author ON book_author(AuthorID);
+CREATE INDEX idx_customer_order_customer ON customer_order(CustomerID);
+CREATE INDEX idx_order_item_order ON orderItem(OrderID);
+CREATE INDEX idx_order_item_book ON orderItem(ISBN);
+
+-- ===================================================
+-- VIEWS FOR COMMON DATA RETRIEVAL OPERATIONS
+-- ===================================================
+
+-- View for calculating total sales revenue by book category
+CREATE VIEW CategorySales AS
+SELECT c.CategoryID, c.CategoryName, SUM(oi.Quantity * oi.Price) AS TotalSales
+FROM category c
+JOIN book b ON c.CategoryID = b.CategoryID
+JOIN orderItem oi ON b.ISBN = oi.ISBN
+GROUP BY c.CategoryID, c.CategoryName;
+
+-- View for ranking authors by the popularity of their books
+CREATE VIEW AuthorPopularity AS
+SELECT a.AuthorID, a.Name, SUM(bd.Popularity) AS TotalPopularity
+FROM author a
+JOIN book_author ba ON a.AuthorID = ba.AuthorID
+JOIN bookDemand bd ON ba.ISBN = bd.ISBN
+GROUP BY a.AuthorID, a.Name;
+
+-- View for books with low inventory (less than 5 copies)
+CREATE VIEW LowStockBooks AS
+SELECT b.ISBN, b.Title, i.StockQuantity
+FROM book b
+JOIN inventory i ON b.ISBN = i.ISBN
+WHERE i.StockQuantity < 5;
+
+-- View for profit margin calculation
+CREATE VIEW BookProfitability AS
+SELECT b.ISBN, b.Title, pm.SalesTotal, pm.CostTotal, 
+       (pm.SalesTotal - pm.CostTotal) AS Profit,
+       CASE 
+         WHEN pm.CostTotal > 0 THEN ROUND((pm.SalesTotal - pm.CostTotal) * 100.0 / pm.CostTotal, 2)
+         ELSE 0
+       END AS ProfitMarginPercent
+FROM book b
+JOIN profitMargin pm ON b.ISBN = pm.ISBN;
+
+-- View for customer purchase history
+CREATE VIEW CustomerPurchaseHistory AS
+SELECT c.CustomerID, c.Name, co.OrderID, co.OrderDate,
+       b.ISBN, b.Title, oi.Quantity, oi.Price, 
+       (oi.Quantity * oi.Price) AS TotalPrice
+FROM customer c
+JOIN customer_order co ON c.CustomerID = co.CustomerID
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+JOIN book b ON oi.ISBN = b.ISBN;

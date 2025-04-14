@@ -1,0 +1,184 @@
+-- =====================================================
+-- SQL QUERIES FROM FINAL REPORT
+-- These queries correspond to the examples provided in the Database User Manual
+-- =====================================================
+
+-- 1. Find titles of all books by Pratchett under $10
+-- Description: Retrieve all book titles written by authors containing "Pratchett" in their name that are priced below $10.
+SELECT b.Title
+FROM book b
+JOIN book_author ba ON b.ISBN = ba.ISBN
+JOIN author a ON ba.AuthorID = a.AuthorID
+WHERE a.Name LIKE '%Pratchett%' AND b.Price < 10;
+
+-- 2. Titles and purchase dates for a specific customer
+-- Description: Retrieve all book titles and their order dates purchased by customer 'CUST001'.
+SELECT b.Title, co.OrderDate
+FROM customer_order co
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+JOIN book b ON oi.ISBN = b.ISBN
+WHERE co.CustomerID = 'CUST001';
+
+-- 3. Books with low stock (<5 copies)
+-- Description: Find all book titles and ISBNs that have fewer than 5 copies in inventory.
+SELECT b.Title, b.ISBN
+FROM book b
+JOIN inventory i ON b.ISBN = i.ISBN
+WHERE i.StockQuantity < 5;
+
+-- 4. Customers who purchased Pratchett books
+-- Description: List all customer names along with the titles of Pratchett books they purchased.
+SELECT c.Name, b.Title
+FROM customer c
+JOIN customer_order co ON c.CustomerID = co.CustomerID
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+JOIN book b ON oi.ISBN = b.ISBN
+JOIN book_author ba ON b.ISBN = ba.ISBN
+JOIN author a ON ba.AuthorID = a.AuthorID
+WHERE a.Name LIKE '%Pratchett%';
+
+-- 5. Total books purchased by a specific customer
+-- Description: Calculate the total number of books purchased by customer 'CUST001'.
+SELECT SUM(oi.Quantity) AS TotalBooks
+FROM customer_order co
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+WHERE co.CustomerID = 'CUST001';
+
+-- 6. Customer who purchased the most books
+-- Description: Identify the customer who purchased the highest quantity of books and their total purchases.
+SELECT c.Name, SUM(oi.Quantity) AS TotalBooks
+FROM customer c
+JOIN customer_order co ON c.CustomerID = co.CustomerID
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+GROUP BY c.CustomerID, c.Name
+ORDER BY TotalBooks DESC
+LIMIT 1;
+
+-- 7. Customer spending report
+-- Description: List all customers with the total dollar amount each has spent.
+SELECT c.Name, SUM(oi.Quantity * oi.Price) AS TotalSpent
+FROM customer c
+JOIN customer_order co ON c.CustomerID = co.CustomerID
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+GROUP BY c.CustomerID, c.Name;
+
+-- 8. Customers spending above average
+-- Description: List customers and their email addresses who spent more than the average customer.
+WITH CustomerTotals AS (
+    SELECT c.CustomerID, SUM(oi.Quantity * oi.Price) AS TotalSpent
+    FROM customer c
+    JOIN customer_order co ON c.CustomerID = co.CustomerID
+    JOIN orderItem oi ON co.OrderID = oi.OrderID
+    GROUP BY c.CustomerID
+)
+SELECT c.Name, cc.Email
+FROM customer c
+JOIN customer_contact cc ON c.CustomerID = cc.CustomerID
+JOIN CustomerTotals ct ON c.CustomerID = ct.CustomerID
+WHERE ct.TotalSpent > (SELECT AVG(TotalSpent) FROM CustomerTotals);
+
+-- 9. Books by copies sold (descending)
+-- Description: List all book titles with total copies sold, sorted from highest to lowest.
+SELECT b.Title, SUM(oi.Quantity) AS TotalSold
+FROM book b
+JOIN orderItem oi ON b.ISBN = oi.ISBN
+GROUP BY b.ISBN, b.Title
+ORDER BY TotalSold DESC;
+
+-- 10. Books by sales revenue (descending)
+-- Description: List all book titles with total sales revenue, sorted from highest to lowest.
+SELECT b.Title, SUM(oi.Quantity * oi.Price) AS TotalRevenue
+FROM book b
+JOIN orderItem oi ON b.ISBN = oi.ISBN
+GROUP BY b.ISBN, b.Title
+ORDER BY TotalRevenue DESC;
+
+-- 11. Most popular author by copies sold
+-- Description: Identify the author whose books have sold the most copies.
+SELECT a.Name, SUM(oi.Quantity) AS TotalSold
+FROM author a
+JOIN book_author ba ON a.AuthorID = ba.AuthorID
+JOIN orderItem oi ON ba.ISBN = oi.ISBN
+GROUP BY a.AuthorID, a.Name
+ORDER BY TotalSold DESC
+LIMIT 1;
+
+-- 12. Most profitable author by revenue
+-- Description: Identify the author whose books have generated the most revenue.
+SELECT a.Name, SUM(oi.Quantity * oi.Price) AS TotalRevenue
+FROM author a
+JOIN book_author ba ON a.AuthorID = ba.AuthorID
+JOIN orderItem oi ON ba.ISBN = oi.ISBN
+GROUP BY a.AuthorID, a.Name
+ORDER BY TotalRevenue DESC
+LIMIT 1;
+
+-- 13. Customers of most profitable author
+-- Description: List all customers who purchased books by the most profitable author.
+WITH TopAuthor AS (
+    SELECT ba.AuthorID
+    FROM book_author ba
+    JOIN orderItem oi ON ba.ISBN = oi.ISBN
+    GROUP BY ba.AuthorID
+    ORDER BY SUM(oi.Quantity * oi.Price) DESC
+    LIMIT 1
+)
+SELECT DISTINCT c.Name, cc.Email, cc.PhoneNumber
+FROM customer c
+JOIN customer_contact cc ON c.CustomerID = cc.CustomerID
+JOIN customer_order co ON c.CustomerID = co.CustomerID
+JOIN orderItem oi ON co.OrderID = oi.OrderID
+JOIN book_author ba ON oi.ISBN = ba.ISBN
+WHERE ba.AuthorID = (SELECT AuthorID FROM TopAuthor);
+
+-- 14. Authors popular among big spenders
+-- Description: List authors whose books were purchased by customers who spent more than average.
+WITH HighSpenders AS (
+    SELECT co.CustomerID
+    FROM customer_order co
+    JOIN orderItem oi ON co.OrderID = oi.OrderID
+    GROUP BY co.CustomerID
+    HAVING SUM(oi.Quantity * oi.Price) > (SELECT AVG(Total) FROM (
+        SELECT SUM(oi.Quantity * oi.Price) AS Total
+        FROM customer_order co
+        JOIN orderItem oi ON co.OrderID = oi.OrderID
+        GROUP BY co.CustomerID
+    ))
+)
+SELECT DISTINCT a.Name
+FROM author a
+JOIN book_author ba ON a.AuthorID = ba.AuthorID
+JOIN orderItem oi ON ba.ISBN = oi.ISBN
+JOIN customer_order co ON oi.OrderID = co.OrderID
+JOIN HighSpenders hs ON co.CustomerID = hs.CustomerID;
+
+-- 15. Most popular book and sales total
+-- Description: Retrieve the title and total sales of the most popular book (popularity = 10).
+SELECT b.Title, pm.SalesTotal
+FROM book b
+JOIN bookDemand bd ON b.ISBN = bd.ISBN
+JOIN profitMargin pm ON b.ISBN = pm.ISBN
+WHERE bd.Popularity = 10;
+
+-- 16. Author of most purchased book
+-- Description: Identify the author of the book with the highest total quantity sold.
+WITH TotalSales AS (
+    SELECT ISBN, SUM(Quantity) AS TotalQuantity
+    FROM orderItem
+    GROUP BY ISBN
+)
+SELECT b.ISBN, b.Title, ts.TotalQuantity, a.Name
+FROM TotalSales ts
+JOIN book b ON ts.ISBN = b.ISBN
+JOIN book_author ba ON b.ISBN = ba.ISBN
+JOIN author a ON ba.AuthorID = a.AuthorID
+ORDER BY ts.TotalQuantity DESC
+LIMIT 1;
+
+-- 17. Least popular book's profit margin
+-- Description: Find the title and profit margin (sales - cost) of the least popular book.
+SELECT b.Title, (pm.SalesTotal - pm.CostTotal) AS ProfitMargin
+FROM book b
+JOIN bookDemand bd ON b.ISBN = bd.ISBN
+JOIN profitMargin pm ON b.ISBN = pm.ISBN
+WHERE bd.Popularity = (SELECT MIN(Popularity) FROM bookDemand);

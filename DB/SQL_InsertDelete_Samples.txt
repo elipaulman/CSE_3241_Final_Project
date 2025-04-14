@@ -1,0 +1,157 @@
+-- =====================================================
+-- SAMPLE INSERT STATEMENTS FROM USER MANUAL
+-- These statements demonstrate the correct order for inserting data
+-- =====================================================
+
+-- 1. Insert into category
+-- Adds five entries representing different book categories.
+INSERT INTO category (CategoryID, CategoryName) VALUES
+('CAT001', 'Fiction'),
+('CAT002', 'Non-Fiction'),
+('CAT003', 'Science Fiction'),
+('CAT004', 'Biography'),
+('CAT005', 'Self-Help');
+
+-- 2. Insert into publisher
+-- Adds three publishers with name, address, and contact info.
+INSERT INTO publisher (PublisherID, Name, Address, ContactInfo) VALUES
+('PUB001', 'Penguin Random House', '1745 Broadway, New York, NY', 'contact@penguinrandomhouse.com'),
+('PUB002', 'HarperCollins', '195 Broadway, New York, NY', 'info@harpercollins.com'),
+('PUB003', 'Simon & Schuster', '1230 Avenue of the Americas, New York, NY', 'contact@simonandschuster.com');
+
+-- 3. Insert into author
+-- Adds five authors.
+INSERT INTO author (AuthorID, Name) VALUES
+('AUT001', 'J.K. Rowling'),
+('AUT002', 'Stephen King'),
+('AUT003', 'Michelle Obama'),
+('AUT004', 'Yuval Noah Harari'),
+('AUT005', 'George Orwell');
+
+-- 4. Insert into customer
+-- Adds three customers (basic info only).
+INSERT INTO customer (CustomerID, Name, Address) VALUES
+('CUST001', 'John Smith', '123 Main St, Anytown, USA'),
+('CUST002', 'Jane Doe', '456 Oak Ave, Somewhere, USA'),
+('CUST003', 'Robert Johnson', NULL);
+
+-- 5. Insert into customer_contact
+-- Links emails and phone numbers to existing customers.
+INSERT INTO customer_contact (CustomerID, Email, PhoneNumber) VALUES
+('CUST001', 'john.smith@email.com', '555-123-4567'),
+('CUST002', 'jane.doe@email.com', '555-987-6543'),
+('CUST003', 'robert.j@email.com', '555-456-7890');
+
+-- 6. Insert into book
+-- Adds five books, referencing publisher and category.
+INSERT INTO book (ISBN, Title, Year, Price, PublisherID, CategoryID) VALUES
+('9780747532743', 'Harry Potter and the Philosopher''s Stone', 1997, 12.99, 'PUB001', 'CAT001'),
+('9780061120084', 'To Kill a Mockingbird', 1960, 9.99, 'PUB002', 'CAT001'),
+('9780307474278', 'Sapiens: A Brief History of Humankind', 2011, 15.99, 'PUB003', 'CAT002'),
+('9780451524935', '1984', 1949, 8.99, 'PUB001', 'CAT003'),
+('9781524763138', 'Becoming', 2018, 22.99, 'PUB002', 'CAT004');
+
+-- 7. Insert into book_author
+-- Creates the many-to-many relationships between books and authors.
+INSERT INTO book_author (ISBN, AuthorID) VALUES
+('9780747532743', 'AUT001'),
+('9780061120084', 'AUT002'),
+('9780307474278', 'AUT004'),
+('9780451524935', 'AUT005'),
+('9781524763138', 'AUT003');
+
+-- 8. Insert into inventory
+-- Tracks stock levels for each book.
+INSERT INTO inventory (ISBN, StockQuantity) VALUES
+('9780747532743', 50),
+('9780061120084', 30),
+('9780307474278', 25),
+('9780451524935', 40),
+('9781524763138', 35);
+
+-- 9. Insert into customer_order
+-- Adds customer orders with fixed dates.
+INSERT INTO customer_order (OrderID, CustomerID, OrderDate) VALUES
+('ORD001', 'CUST001', '2023-05-15'),
+('ORD002', 'CUST002', '2023-05-16'),
+('ORD003', 'CUST001', '2023-05-17');
+
+-- 10. Insert into orderItem
+-- Adds specific books to specific orders.
+INSERT INTO orderItem (OrderItemID, OrderID, ISBN, Quantity, Price) VALUES
+('ITEM001', 'ORD001', '9780747532743', 2, 12.99),
+('ITEM002', 'ORD001', '9780307474278', 1, 15.99),
+('ITEM003', 'ORD002', '9781524763138', 1, 22.99),
+('ITEM004', 'ORD003', '9780451524935', 3, 8.99);
+
+-- 11. Insert into bookDemand
+-- Tracks popularity scores for each book.
+INSERT INTO bookDemand (ISBN, Popularity) VALUES
+('9780747532743', 95),
+('9780061120084', 80),
+('9780307474278', 85),
+('9780451524935', 75),
+('9781524763138', 90);
+
+-- 12. Insert into profitMargin
+-- Tracks total sales and cost for each book.
+INSERT INTO profitMargin (ISBN, SalesTotal, CostTotal) VALUES
+('9780747532743', 1299.00, 800.00),
+('9780061120084', 799.20, 500.00),
+('9780307474278', 1279.20, 900.00),
+('9780451524935', 899.00, 600.00),
+('9781524763138', 1149.50, 800.00);
+
+
+-- =====================================================
+-- SAMPLE DELETE STATEMENTS FROM USER MANUAL
+-- These statements demonstrate the correct order for deleting data
+-- =====================================================
+
+-- 1. Delete from orderItem
+-- Removes specific items in orders. Must be deleted before customer_order.
+DELETE FROM orderItem WHERE OrderItemID = 'ITEM001';
+
+-- 2. Delete from customer_order
+-- Removes full orders. Must be deleted before customer.
+DELETE FROM customer_order WHERE OrderID = 'ORD001';
+
+-- 3. Delete from customer_contact
+-- Removes contact details. Must be deleted before customer.
+DELETE FROM customer_contact WHERE CustomerID = 'CUST001';
+
+-- 4. Delete from customer
+-- Removes the customer record. Must be after deleting orders and contact info.
+DELETE FROM customer WHERE CustomerID = 'CUST001';
+
+-- 5. Delete from inventory
+-- Removes inventory info linked to a book.
+DELETE FROM inventory WHERE ISBN = '9780747532743';
+
+-- 6. Delete from book_author
+-- Removes relationships between books and authors.
+DELETE FROM book_author WHERE ISBN = '9780747532743';
+
+-- 7. Delete from bookDemand
+-- Removes popularity tracking. Must be removed before deleting books.
+DELETE FROM bookDemand WHERE ISBN = '9780747532743';
+
+-- 8. Delete from profitMargin
+-- Removes profit tracking. Must be removed before deleting books.
+DELETE FROM profitMargin WHERE ISBN = '9780747532743';
+
+-- 9. Delete from book
+-- Deletes the book record itself. All dependencies must be cleared first.
+DELETE FROM book WHERE ISBN = '9780747532743';
+
+-- 10. Delete from author
+-- Deletes the author. Must delete any references in book_author first.
+DELETE FROM author WHERE AuthorID = 'AUT001';
+
+-- 11. Delete from publisher
+-- Deletes publisher info. Must be done after removing all associated books.
+DELETE FROM publisher WHERE PublisherID = 'PUB001';
+
+-- 12. Delete from category
+-- Deletes the category. Must be done after all associated books are removed.
+DELETE FROM category WHERE CategoryID = 'CAT001';

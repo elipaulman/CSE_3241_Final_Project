@@ -23,6 +23,8 @@ This document provides an overview of all project files and their locations.
 - `SQL_Insert.txt` — SQL scripts for inserting sample data  
 - `SQL_Queries.txt` — SQL queries referenced in the final report  
 - `SQL_InsertDelete_Samples.txt` — Sample INSERT/DELETE statements from user manual  
+- `CSE 3241 SQL Creates.pdf` - PDF version of SQL scripts for creating the database
+- `CSE 3241 SQL Inserts.pdf` - PDF version of SQL scripts for into all data into the database
 
 ---
 
@@ -31,6 +33,7 @@ This document provides an overview of all project files and their locations.
 **Located in:** `/User Manual/`
 
 - `DB_Creation_Instructions.md` — Instructions for creating/setting up the database  
+- `CSE 3241 User Manual` — User manual for developers using and interacting with the database 
 
 ---
 
@@ -50,8 +53,15 @@ This document provides an overview of all project files and their locations.
 - `WorksheetTwoExtraQueries.pdf` — Additional query documentation  
 
 ---
+## 5. FINAL REPORT
 
-## 5. FILE LOCATIONS (QUICK REFERENCE)
+**Located in:** `/Final_Report/`
+
+- `CSE 3241 Database Description.pdf` — COntains all information on database design, functional dependencies, normalization, ER diagram, schema diagrams and more. 
+
+---
+
+## 6. FILE LOCATIONS (QUICK REFERENCE)
 
 - **Binary Database:**  
   `DB/Bookstore.db`

@@ -1,48 +1,72 @@
-# README
+# CSE 3241 FINAL PROJECT - BOOKSTORE DATABASE  
+## TABLE OF CONTENTS
 
-## Project Overview
-This project is an information management system and database for Bits & Books, designed to support their inventory and sales operations. The project includes a relational database schema, an entity-relationship diagram, SQL queries, and reports. The system is developed incrementally with feedback provided at various checkpoints.
+**Project Authors:** Elijah Paulman, Christian Coulibaly, Rohit Navaneetha, Kyle Roessle
 
-## File Structure
-Below is the layout of the project files and their purposes:
+This document provides an overview of all project files and their locations.
 
-### Root Directory
-- **Project_Instructions.md**: Contains detailed instructions and requirements for the project.
-- **README.md**: This file, providing an overview and file structure of the project.
+---
 
-### Checkpoints/
-- **Checkpoint_1.pdf**: First checkpoint document.
-- **Checkpoint_2.pdf**: Second checkpoint document.
-- **Checkpoint_3.pdf**: Third checkpoint document.
-- **Checkpoint_4.pdf**: Fourth checkpoint document.
-- **Checkpoint_2_Queries/**: Contains advanced, extra, and simple query worksheets for Checkpoint 2.
-  - **WorksheetTwoAdvancedQueries.pdf**
-  - **WorksheetTwoExtraQueries.pdf**
-  - **WorksheetTwoSimpleQueries.pdf**
+## 1. PROJECT ROOT DIRECTORY
 
-### DB/
-- **bookstore_database.sqlite**: The binary version of the database.
-- **SQL_Create.txt**: SQL scripts to create the database schema.
-- **SQL_Insert.txt**: SQL scripts for inserting sample data into the database.
+- `README.md` — Project overview and high-level file structure  
+- `Project_Instructions.md` — Original project requirements and specifications  
 
-### Final_Report/
-- Contains the final project report, including the relational schema, ER diagram, and other required documentation.
+---
 
-### User Manual/
-- **DB_Creation_Instructions.md**: Instructions for creating and setting up the database.
+## 2. DATABASE FILES
 
-## How to Use
-1. **Database Setup**:
-   - Use the `SQL_Create.txt` file to create the database schema.
-   - Use the `SQL_Insert.txt` file to populate the database with sample data.
+**Located in:** `/DB/`
 
-2. **Query Execution**:
-   - Use the SQL queries provided in the `Final_Report/` and `Checkpoint_2_Queries/` directories to interact with the database.
+- `Bookstore.db` — Binary SQLite database file for direct use  
+- `SQL_Create.txt` — SQL scripts for database schema creation (tables, indexes, views)  
+- `SQL_Insert.txt` — SQL scripts for inserting sample data  
+- `SQL_Queries.txt` — SQL queries referenced in the final report  
+- `SQL_InsertDelete_Samples.txt` — Sample INSERT/DELETE statements from user manual  
 
-3. **Documentation**:
-   - Refer to the `Final_Report/` directory for the final project report.
-   - Use the `User Manual/` directory for detailed instructions on database usage.
+---
 
-## Additional Notes
-- Ensure you have SQLite installed to interact with the database.
-- For any issues or questions, refer to the `Project_Instructions.md` file for guidance.
+## 3. USER MANUAL
+
+**Located in:** `/User Manual/`
+
+- `DB_Creation_Instructions.md` — Instructions for creating/setting up the database  
+
+---
+
+## 4. CHECKPOINT DOCUMENTATION
+
+**Located in:** `/Checkpoints/`
+
+- `Checkpoint_1.pdf` — Initial project proposal and requirements  
+- `Checkpoint_2.pdf` — Database design and schema documentation  
+- `Checkpoint_3.pdf` — Normalized database schema documentation  
+- `Checkpoint_4.pdf` — Final project documentation  
+
+**Located in:** `/Checkpoints/Checkpoint_2_Queries/`
+
+- `WorksheetTwoSimpleQueries.pdf` — Basic query documentation  
+- `WorksheetTwoAdvancedQueries.pdf` — Complex query documentation  
+- `WorksheetTwoExtraQueries.pdf` — Additional query documentation  
+
+---
+
+## 5. FILE LOCATIONS (QUICK REFERENCE)
+
+- **Binary Database:**  
+  `DB/Bookstore.db`
+
+- **Schema Creation Scripts:**  
+  `DB/SQL_Create.txt`
+
+- **Data Files:**  
+  `DB/SQL_Insert.txt`
+
+- **SQL Queries:**  
+  `DB/SQL_Queries.txt`
+
+- **Sample INSERT/DELETE Statements:**  
+  `DB/SQL_InsertDelete_Samples.txt`
+
+- **Instructions for Database Setup:**  
+  `User Manual/DB_Creation_Instructions.md`
